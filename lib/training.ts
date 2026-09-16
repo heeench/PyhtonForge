@@ -4,7 +4,10 @@ import foundationRaw from './foundation-tasks.json';
 export type Test={name:string;check?:string;setup?:string;expected?:Record<string,unknown>[]};
 export type Task={id:string;topic:string;title:string;description:string;starter:string;tests:Test[];hints:string[];theory:string;level:number;production:boolean;example:string;constraints:string[];language:string;packages:string[]};
 export const tasks=[...(raw as Task[]),...(phase1Raw as Task[]),...(foundationRaw as Task[])];
-export const topics=[...new Set(tasks.map(t=>t.topic))];
+export const topics=['Python core','Collections','Functions','Exceptions','OOP','Iterators / generators','Decorators','Typing','Async','Testing','HTTP / FastAPI','PostgreSQL / SQL','External failures'];
+export const foundationPath=['foundation-greeting','foundation-even','foundation-sum-positive'];
+export const firstTask=tasks.find(t=>t.id===foundationPath[0])!;
+export function foundationNext(entries:Entry[]){return foundationPath.find(id=>!entries.some(e=>e.task===id&&e.kind==='run'&&e.passed&&!e.hints&&!e.assisted));}
 export type Result={name:string;pass:boolean;error?:string;type?:string};
 export type Entry={id:string;session:string;task:string;mode:string;kind:'run'|'hint'|'review'|'skip'|'theory';time:number;elapsed:number;hints:number;before:number;after?:number;results?:Result[];code?:string;passed?:boolean;assisted?:boolean;explanation?:string;score?:number};
 export function skill(topic:string,entries:Entry[]){
@@ -22,13 +25,16 @@ export function skill(topic:string,entries:Entry[]){
  const retention=Math.min(100,Math.round((Math.min(spacedDays,5)/5)*100));
  const theoryUnderstanding=0; // Written answers are ungraded evidence, never automatic mastery.
  const theoryResponses=theoryEntries.length;
- const calibrationError=runs.length?Math.round(runs.reduce((n,e)=>n+Math.abs((e.before===1?.2:e.before===2?.5:.8)-(e.passed?1:0)),0)/runs.length*100):0;
+ const rated=runs.filter(e=>e.before>=1&&e.before<=3);
+ const calibrationError=rated.length?Math.round(rated.reduce((n,e)=>n+Math.abs((e.before===1?.2:e.before===2?.5:.8)-(e.passed?1:0)),0)/rated.length*100):0;
  const mastery=Math.min(days<2?60:100,Math.round(implementation*.5+independence*.25+retention*.25));
  const intervalDays=[1,3,7,14,30][Math.min(4,Math.floor(mastery/25))];
  const due=last>0&&Date.now()-last>=intervalDays*86400000;
  return {theoryResponses,mastery,implementation,independence,retention,theoryUnderstanding,debugging:0,interviewExplanation:0,calibrationError,runs:runs.length,wins:wins.length,independent:independent.length,distinct,days,accuracy,due,last,intervalDays,proven:mastery>=80&&distinct>=2&&spacedDays>=2};
 }
 export function recommend(entries:Entry[],mode:string,filter='Все темы',exclude=''){
+ const foundation=foundationPath.find(id=>id!==exclude&&!entries.some(e=>e.task===id&&e.kind==='run'&&e.passed&&!e.hints&&!e.assisted));
+ if(mode==='Practice'&&(filter==='Все темы'||filter==='Python core')&&foundation&&foundation!==exclude)return {task:tasks.find(t=>t.id===foundation)!,reason:'Python core: сначала функция, затем условие и цикл. Закрепляем базу самостоятельным кодом.'};
  const pool=tasks.filter(t=>(filter==='Все темы'||t.topic===filter)&&(mode!=='Production'||t.production));
  const scored=pool.map((t,i)=>{
    const s=skill(t.topic,entries);
