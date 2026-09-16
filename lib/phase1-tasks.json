@@ -1,0 +1,246 @@
+[
+  {
+    "id": "copy-depth",
+    "topic": "Python core",
+    "title": "Копия без общей вложенности",
+    "description": "Реализуйте clone_config(config). Верните копию конфигурации, в которой вложенные списки и словари не разделяют изменяемые объекты с исходным config.",
+    "starter": "def clone_config(config: dict) -> dict:\n    pass\n",
+    "tests": [
+      {"name": "Значения сохранены", "check": "clone_config({'a':1,'nested':{'x':[2]}}) == {'a':1,'nested':{'x':[2]}}"},
+      {"name": "Вложенный список независим", "check": "x={'nested':{'items':[1]}}; y=clone_config(x); y['nested']['items'].append(2); assert x == {'nested':{'items':[1]}}"},
+      {"name": "Вложенный словарь независим", "check": "x={'nested':{'enabled':True}}; y=clone_config(x); y['nested']['enabled']=False; assert x['nested']['enabled'] is True"},
+      {"name": "Верхний объект новый", "check": "x={'a':1}; assert clone_config(x) is not x"}
+    ],
+    "hints": ["Поверхностная копия недостаточна для вложенных изменяемых объектов.", "Ищите стандартный механизм глубокого копирования.", "Проверьте, что после изменения результата исходный config не изменился."],
+    "theory": "copy.copy копирует только внешний контейнер. copy.deepcopy рекурсивно создаёт вложенные изменяемые объекты, но может быть дорогим и не подходит для всех объектов.",
+    "level": 2,
+    "production": true,
+    "example": "config = {'db': {'hosts': ['primary']}}",
+    "constraints": ["Не изменяйте исходную конфигурацию.", "Сохраните тип словаря."],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "sort-key",
+    "topic": "Python core",
+    "title": "Стабильная сортировка по нескольким полям",
+    "description": "Реализуйте sort_tickets(tickets). Отсортируйте тикеты по priority по возрастанию, затем по created_at по возрастанию. Если значения равны, сохраните исходный порядок.",
+    "starter": "def sort_tickets(tickets: list[dict]) -> list[dict]:\n    pass\n",
+    "tests": [
+      {"name": "Приоритет и дата", "check": "sort_tickets([{'id':1,'priority':2,'created_at':3},{'id':2,'priority':1,'created_at':5},{'id':3,'priority':1,'created_at':2}]) == [{'id':3,'priority':1,'created_at':2},{'id':2,'priority':1,'created_at':5},{'id':1,'priority':2,'created_at':3}]"},
+      {"name": "Стабильность", "check": "x=[{'id':'a','priority':1,'created_at':2},{'id':'b','priority':1,'created_at':2}]; assert [t['id'] for t in sort_tickets(x)] == ['a','b']"},
+      {"name": "Исходный список не изменён", "check": "x=[{'id':1,'priority':2,'created_at':1}]; y=sort_tickets(x); assert y is not x and x == [{'id':1,'priority':2,'created_at':1}]"},
+      {"name": "Пустой ввод", "check": "sort_tickets([]) == []"}
+    ],
+    "hints": ["sorted возвращает новый список и сохраняет порядок равных элементов.", "Ключом может быть кортеж из двух полей.", "Сортируйте по (priority, created_at)."],
+    "theory": "Python использует стабильную сортировку. Ключ-кортеж задаёт лексикографический порядок и обычно делает контракт явнее, чем две независимые сортировки.",
+    "level": 2,
+    "production": true,
+    "example": "priority=1 важнее priority=2; при равенстве раньше created_at",
+    "constraints": ["Верните новый список.", "Не используйте сортировку с изменением входного списка."],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "context-manager",
+    "topic": "Python core",
+    "title": "Ресурс закрывается при ошибке",
+    "description": "Создайте класс managed_resource(resource) как context manager. При входе возвращайте resource, при выходе вызывайте resource.close(). Ошибки внутри with не подавляйте.",
+    "starter": "class managed_resource:\n    def __init__(self, resource):\n        pass\n\n    def __enter__(self):\n        pass\n\n    def __exit__(self, exc_type, exc, tb):\n        pass\n",
+    "tests": [
+      {"name": "Вход и выход", "check": "class R:\n    def __init__(self): self.closed=False\n    def close(self): self.closed=True\nr=R()\nwith managed_resource(r) as value: assert value is r\nassert r.closed"},
+      {"name": "Закрытие при ошибке", "check": "class R:\n    def __init__(self): self.closed=False\n    def close(self): self.closed=True\nr=R()\ntry:\n    with managed_resource(r): raise ValueError('x')\nexcept ValueError: pass\nelse: raise AssertionError()\nassert r.closed"},
+      {"name": "Ошибка не подавляется", "check": "class R:\n    def close(self): pass\ntry:\n    with managed_resource(R()): raise RuntimeError('boom')\nexcept RuntimeError: pass\nelse: raise AssertionError()"},
+      {"name": "Возврат None", "check": "class R:\n    def close(self): pass\nassert managed_resource(R()).__exit__(None,None,None) is None"}
+    ],
+    "hints": ["Контекстный менеджер использует __enter__ и __exit__.", "__exit__ получает тип, значение и traceback исключения.", "Чтобы не подавить ошибку, верните False или None."],
+    "theory": "with гарантирует освобождение ресурса даже при исключении. Это основа безопасной работы с файлами, соединениями и блокировками.",
+    "level": 2,
+    "production": true,
+    "example": "with managed_resource(connection):\n    use(connection)",
+    "constraints": ["Ресурс должен закрываться при любом выходе.", "Не подавляйте исключения пользователя."],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "custom-error",
+    "topic": "Exceptions",
+    "title": "Своя ошибка на границе домена",
+    "description": "Создайте исключение InvalidTicket(ValueError). Реализуйте validate_ticket(ticket): если нет title или title пустой после strip, выбросьте InvalidTicket с понятным сообщением. Иначе верните очищенный title.",
+    "starter": "class InvalidTicket(ValueError):\n    pass\n\ndef validate_ticket(ticket: dict) -> str:\n    pass\n",
+    "tests": [
+      {"name": "Корректный ticket", "check": "validate_ticket({'title':'  Disk full  '}) == 'Disk full'"},
+      {"name": "Пустой title", "check": "try: validate_ticket({'title':'  '})\nexcept InvalidTicket as e: assert 'title' in str(e)\nelse: raise AssertionError()"},
+      {"name": "Отсутствующий title", "check": "try: validate_ticket({})\nexcept InvalidTicket: pass\nelse: raise AssertionError()"},
+      {"name": "Это ValueError", "check": "assert issubclass(InvalidTicket, ValueError)"}
+    ],
+    "hints": ["Доменное исключение должно объяснять вызывающему коду класс ошибки.", "Проверьте ключ через get или обработайте отсутствие ключа.", "Сообщение должно помогать найти поле, нарушившее контракт."],
+    "theory": "Свои исключения отделяют ошибки домена от ошибок инфраструктуры. Наследование от ValueError сохраняет совместимость с общим обработчиком невалидных значений.",
+    "level": 2,
+    "production": true,
+    "example": "validate_ticket({'title': '  '}) → InvalidTicket",
+    "constraints": ["Не возвращайте False вместо исключения.", "Не ловите ошибку внутри validate_ticket."],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "sql-having",
+    "topic": "PostgreSQL / SQL",
+    "title": "Группы с минимальной выручкой",
+    "description": "Выведите user_id и total только для пользователей, у которых сумма оплаченных заказов не меньше 100. Сортируйте total по убыванию, затем user_id.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {"name":"Основной набор","setup":"CREATE TABLE orders(id int,user_id int,amount int,status text); INSERT INTO orders VALUES(1,1,60,'paid'),(2,1,50,'paid'),(3,2,99,'paid'),(4,2,30,'pending'),(5,3,120,'paid');","expected":[{"user_id":3,"total":120},{"user_id":1,"total":110}]},
+      {"name":"Другие данные","setup":"CREATE TABLE orders(id int,user_id int,amount int,status text); INSERT INTO orders VALUES(1,4,100,'paid'),(2,4,1,'pending'),(3,5,99,'paid');","expected":[{"user_id":4,"total":100}]},
+      {"name":"Пустая таблица","setup":"CREATE TABLE orders(id int,user_id int,amount int,status text);","expected":[]}
+    ],
+    "hints": ["WHERE фильтрует заказы до группировки.", "Условие на сумму группы задаётся через HAVING.", "Не фильтруйте total через WHERE."],
+    "theory": "HAVING применяется после GROUP BY и может использовать агрегат. WHERE и HAVING отвечают за разные уровни данных.",
+    "level": 2,
+    "production": true,
+    "example": "Оплаченные суммы: user 1 → 110, user 3 → 120",
+    "constraints": ["Учитывайте только status = paid.", "Назовите сумму total."],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "sql-case-null",
+    "topic": "PostgreSQL / SQL",
+    "title": "CASE и неизвестное значение",
+    "description": "Для каждого заказа выведите id и risk: 'high' для amount >= 100, 'medium' для amount между 30 и 99, 'unknown' для NULL и 'low' для остальных. Сортируйте по id.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {"name":"Категории","setup":"CREATE TABLE orders(id int,amount int); INSERT INTO orders VALUES(1,150),(2,50),(3,10),(4,NULL);","expected":[{"id":1,"risk":"high"},{"id":2,"risk":"medium"},{"id":3,"risk":"low"},{"id":4,"risk":"unknown"}]},
+      {"name":"Граница","setup":"CREATE TABLE orders(id int,amount int); INSERT INTO orders VALUES(1,100),(2,30),(3,29);","expected":[{"id":1,"risk":"high"},{"id":2,"risk":"medium"},{"id":3,"risk":"low"}]},
+      {"name":"Пустой ввод","setup":"CREATE TABLE orders(id int,amount int);","expected":[]}
+    ],
+    "hints": ["CASE проверяет условия сверху вниз.", "NULL нельзя надёжно сравнивать через = NULL.", "Отдельная ветка WHEN amount IS NULL обработает неизвестное значение."],
+    "theory": "CASE выражает бизнес-классификацию прямо в запросе. NULL не равен нулю и не равен сам себе; это отсутствие известного значения.",
+    "level": 2,
+    "production": true,
+    "example": "NULL → unknown, 0 → low",
+    "constraints": ["Не превращайте NULL в low.", "Результат должен иметь столбцы id и risk."],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "sql-multi-join",
+    "topic": "PostgreSQL / SQL",
+    "title": "Три таблицы и итог по продукту",
+    "description": "Таблицы orders(id), order_items(order_id, product_id, quantity), products(id, name). Верните name и units для оплаченных заказов. Сгруппируйте по продукту и отсортируйте units по убыванию, затем name.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {"name":"Несколько JOIN","setup":"CREATE TABLE orders(id int,status text); INSERT INTO orders VALUES(1,'paid'),(2,'pending'),(3,'paid'); CREATE TABLE order_items(order_id int,product_id int,quantity int); INSERT INTO order_items VALUES(1,10,2),(1,20,1),(2,10,9),(3,10,3); CREATE TABLE products(id int,name text); INSERT INTO products VALUES(10,'Keyboard'),(20,'Mouse');","expected":[{"name":"Keyboard","units":5},{"name":"Mouse","units":1}]},
+      {"name":"Другой набор","setup":"CREATE TABLE orders(id int,status text); INSERT INTO orders VALUES(1,'paid'); CREATE TABLE order_items(order_id int,product_id int,quantity int); INSERT INTO order_items VALUES(1,5,4); CREATE TABLE products(id int,name text); INSERT INTO products VALUES(5,'Cable');","expected":[{"name":"Cable","units":4}]},
+      {"name":"Нет оплаченных","setup":"CREATE TABLE orders(id int,status text); INSERT INTO orders VALUES(1,'pending'); CREATE TABLE order_items(order_id int,product_id int,quantity int); INSERT INTO order_items VALUES(1,5,4); CREATE TABLE products(id int,name text); INSERT INTO products VALUES(5,'Cable');","expected":[]}
+    ],
+    "hints": ["Свяжите orders с order_items по order_id.", "Затем свяжите order_items с products по product_id.", "Фильтр paid примените к orders до группировки."],
+    "theory": "Несколько JOIN расширяют связь между доменными сущностями. Ошибка в условии JOIN может дублировать строки и завысить агрегаты.",
+    "level": 2,
+    "production": true,
+    "example": "paid order → items → product → SUM(quantity)",
+    "constraints": ["Не учитывайте pending-заказы.", "Результат: name, units."],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "sql-cte",
+    "topic": "PostgreSQL / SQL",
+    "title": "CTE для повторного условия",
+    "description": "Сначала в CTE посчитайте paid_total по user_id. Затем выведите пользователей с paid_total > 50 и колонками user_id, paid_total, сегмент = 'power' для суммы >= 100 и 'regular' иначе.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {"name":"CTE и CASE","setup":"CREATE TABLE orders(id int,user_id int,amount int,status text); INSERT INTO orders VALUES(1,1,70,'paid'),(2,1,40,'paid'),(3,2,60,'paid'),(4,3,20,'paid'),(5,3,50,'pending');","expected":[{"user_id":1,"paid_total":110,"segment":"power"},{"user_id":2,"paid_total":60,"segment":"regular"}]},
+      {"name":"Фильтр после агрегации","setup":"CREATE TABLE orders(id int,user_id int,amount int,status text); INSERT INTO orders VALUES(1,4,51,'paid'),(2,5,50,'paid');","expected":[{"user_id":4,"paid_total":51,"segment":"regular"}]},
+      {"name":"Пустой результат","setup":"CREATE TABLE orders(id int,user_id int,amount int,status text);","expected":[]}
+    ],
+    "hints": ["CTE начинается с WITH name AS (...).", "В CTE оставьте user_id и SUM(amount).", "Фильтр paid_total > 50 можно применить во внешнем SELECT."],
+    "theory": "CTE даёт имя промежуточному результату и отделяет этапы запроса. Это улучшает читаемость сложного SQL, но не гарантирует материализацию.",
+    "level": 2,
+    "production": true,
+    "example": "CTE paid_totals → внешний CASE и фильтр",
+    "constraints": ["Используйте CTE.", "Сортировка: paid_total по убыванию, user_id по возрастанию."],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "sql-duplicates",
+    "topic": "PostgreSQL / SQL",
+    "title": "Найти дубли по бизнес-ключу",
+    "description": "Таблица webhook_events(id, external_id, received_at). Верните external_id и occurrences только для external_id, встречающихся больше одного раза. Отсортируйте occurrences по убыванию, затем external_id.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {"name":"Дубли","setup":"CREATE TABLE webhook_events(id int,external_id text,received_at text); INSERT INTO webhook_events VALUES(1,'a','1'),(2,'a','2'),(3,'b','3'),(4,'c','4'),(5,'c','5'),(6,'c','6');","expected":[{"external_id":"c","occurrences":3},{"external_id":"a","occurrences":2}]},
+      {"name":"Один дубль","setup":"CREATE TABLE webhook_events(id int,external_id text,received_at text); INSERT INTO webhook_events VALUES(1,'x','1'),(2,'x','2');","expected":[{"external_id":"x","occurrences":2}]},
+      {"name":"Нет дублей","setup":"CREATE TABLE webhook_events(id int,external_id text,received_at text); INSERT INTO webhook_events VALUES(1,'x','1'),(2,'y','2');","expected":[]}
+    ],
+    "hints": ["Сгруппируйте по external_id.", "Количество строк группы — COUNT(*).", "Фильтр по COUNT(*) идёт в HAVING."],
+    "theory": "Дубликат определяется бизнес-ключом, а не обязательно первичным id. Такой запрос полезен для диагностики идемпотентности webhook-обработчика.",
+    "level": 2,
+    "production": true,
+    "example": "external_id='c' встречается 3 раза",
+    "constraints": ["Не выводите внутренний id.", "Назовите количество occurrences."],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "sql-anti-join",
+    "topic": "PostgreSQL / SQL",
+    "title": "Пользователи без оплаченных заказов",
+    "description": "Таблицы users(id, email) и orders(id, user_id, status). Верните id и email пользователей, у которых нет ни одного оплаченного заказа. Сортируйте по id.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {"name":"LEFT JOIN anti-join","setup":"CREATE TABLE users(id int,email text); INSERT INTO users VALUES(1,'a'),(2,'b'),(3,'c'); CREATE TABLE orders(id int,user_id int,status text); INSERT INTO orders VALUES(1,1,'paid'),(2,2,'pending');","expected":[{"id":2,"email":"b"},{"id":3,"email":"c"}]},
+      {"name":"Все без оплаты","setup":"CREATE TABLE users(id int,email text); INSERT INTO users VALUES(4,'d'),(5,'e'); CREATE TABLE orders(id int,user_id int,status text); INSERT INTO orders VALUES(1,4,'pending');","expected":[{"id":4,"email":"d"},{"id":5,"email":"e"}]},
+      {"name":"Нет пользователей","setup":"CREATE TABLE users(id int,email text); CREATE TABLE orders(id int,user_id int,status text);","expected":[]}
+    ],
+    "hints": ["LEFT JOIN сохраняет users без совпадения.", "Условие paid разместите в ON.", "После JOIN проверяйте отсутствие совпадения через IS NULL."],
+    "theory": "Anti-join ищет отсутствие связанной записи. Условие на правую таблицу в WHERE может случайно уничтожить смысл LEFT JOIN.",
+    "level": 2,
+    "production": true,
+    "example": "pending не считается оплаченной покупкой",
+    "constraints": ["Не используйте внутренний список в памяти.", "Учитывайте пользователей без любых заказов."],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "sql-subquery",
+    "topic": "PostgreSQL / SQL",
+    "title": "Выше средней выручки",
+    "description": "Выведите user_id и total оплаченных заказов только для пользователей, чья выручка выше средней выручки среди пользователей с оплаченной покупкой. Используйте подзапрос или CTE. Сортируйте total по убыванию.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {"name":"Сравнение с агрегатом","setup":"CREATE TABLE orders(id int,user_id int,amount int,status text); INSERT INTO orders VALUES(1,1,100,'paid'),(2,2,30,'paid'),(3,3,50,'paid'),(4,4,20,'pending');","expected":[{"user_id":1,"total":100}]},
+      {"name":"Два пользователя выше среднего","setup":"CREATE TABLE orders(id int,user_id int,amount int,status text); INSERT INTO orders VALUES(1,1,80,'paid'),(2,2,70,'paid'),(3,3,10,'paid');","expected":[{"user_id":1,"total":80},{"user_id":2,"total":70}]},
+      {"name":"Нет результата","setup":"CREATE TABLE orders(id int,user_id int,amount int,status text); INSERT INTO orders VALUES(1,1,10,'paid');","expected":[]}
+    ],
+    "hints": ["Сначала получите сумму по каждому пользователю.", "Среднюю сумму можно посчитать во втором агрегирующем запросе.", "Сравнивайте total с одним скалярным значением средней суммы."],
+    "theory": "Подзапрос отделяет промежуточную агрегацию от внешнего фильтра. Важно определить, что именно является средней величиной: средняя сумма пользователя, а не средний отдельный заказ.",
+    "level": 3,
+    "production": true,
+    "example": "totals: 100, 30, 50 → average 60 → остаётся 100",
+    "constraints": ["Учитывайте только paid.", "Не возвращайте pending-пользователей."],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "sql-latest",
+    "topic": "PostgreSQL / SQL",
+    "title": "Последнее событие клиента",
+    "description": "Таблица customer_events(id, customer_id, event_type, created_at). Верните последнее событие каждого customer_id. Столбцы: customer_id, event_type, created_at. При одинаковом времени выберите событие с большим id.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {"name":"Последнее событие","setup":"CREATE TABLE customer_events(id int,customer_id int,event_type text,created_at int); INSERT INTO customer_events VALUES(1,10,'created',1),(2,10,'paid',2),(3,20,'created',1),(4,20,'failed',3);","expected":[{"customer_id":10,"event_type":"paid","created_at":2},{"customer_id":20,"event_type":"failed","created_at":3}]},
+      {"name":"Tie break по id","setup":"CREATE TABLE customer_events(id int,customer_id int,event_type text,created_at int); INSERT INTO customer_events VALUES(1,5,'a',4),(9,5,'b',4),(2,6,'x',1);","expected":[{"customer_id":5,"event_type":"b","created_at":4},{"customer_id":6,"event_type":"x","created_at":1}]},
+      {"name":"Пустая таблица","setup":"CREATE TABLE customer_events(id int,customer_id int,event_type text,created_at int);","expected":[]}
+    ],
+    "hints": ["ROW_NUMBER() может нумеровать события внутри customer_id.", "Сортируйте created_at DESC, id DESC.", "Оставьте строки с rn = 1 во внешнем запросе."],
+    "theory": "Получение последней записи — частый production-паттерн. Оконная функция сохраняет строку и позволяет выбрать победителя по детерминированному порядку.",
+    "level": 3,
+    "production": true,
+    "example": "При одинаковом created_at больший id считается более новым",
+    "constraints": ["Результат: customer_id, event_type, created_at.", "Сортировка по customer_id."],
+    "language": "sql",
+    "packages": []
+  }
+]
