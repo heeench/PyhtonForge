@@ -16,17 +16,17 @@ export function skill(topic:string,entries:Entry[]){
  const recent=sessions.slice(-5);const accuracy=recent.length?recent.filter(s=>s.win).length/recent.length:0;
  const last=wins.length?Math.max(...wins.map(s=>s.win!.time)):0;
  const spacedDays=[...new Set(independent.map(s=>new Date(s.win!.time).toISOString().slice(0,10)))].length;
- const reviewEntries=entries.filter(e=>ids.includes(e.task)&&e.kind==='review'&&e.after);
  const theoryEntries=entries.filter(e=>ids.includes(e.task)&&e.kind==='theory');
  const implementation=Math.min(100,Math.round((wins.length?wins.reduce((n,s)=>n+(s.win!.hints||s.win!.assisted?0.55:1),0)/Math.max(runs.length,1):0)*100));
  const independence=Math.min(100,Math.round((independent.length/Math.max(2,distinct*2))*100));
  const retention=Math.min(100,Math.round((Math.min(spacedDays,5)/5)*100));
- const theoryUnderstanding=Math.min(100,Math.round((theoryEntries.length?theoryEntries.filter(e=>(e.score||0)>=60||(e.explanation&&e.explanation.trim().length>=30)).length/Math.max(theoryEntries.length,1):reviewEntries.filter(e=>(e.after||0)>=2).length/Math.max(2,reviewEntries.length))*100));
+ const theoryUnderstanding=0; // Written answers are ungraded evidence, never automatic mastery.
+ const theoryResponses=theoryEntries.length;
  const calibrationError=runs.length?Math.round(runs.reduce((n,e)=>n+Math.abs((e.before===1?.2:e.before===2?.5:.8)-(e.passed?1:0)),0)/runs.length*100):0;
- const mastery=Math.round(implementation*.45+independence*.2+retention*.2+theoryUnderstanding*.15);
+ const mastery=Math.min(days<2?60:100,Math.round(implementation*.5+independence*.25+retention*.25));
  const intervalDays=[1,3,7,14,30][Math.min(4,Math.floor(mastery/25))];
  const due=last>0&&Date.now()-last>=intervalDays*86400000;
- return {mastery,implementation,independence,retention,theoryUnderstanding,debugging:0,interviewExplanation:0,calibrationError,runs:runs.length,wins:wins.length,independent:independent.length,distinct,days,accuracy,due,last,intervalDays,proven:mastery>=80&&distinct>=2&&spacedDays>=2};
+ return {theoryResponses,mastery,implementation,independence,retention,theoryUnderstanding,debugging:0,interviewExplanation:0,calibrationError,runs:runs.length,wins:wins.length,independent:independent.length,distinct,days,accuracy,due,last,intervalDays,proven:mastery>=80&&distinct>=2&&spacedDays>=2};
 }
 export function recommend(entries:Entry[],mode:string,filter='Все темы',exclude=''){
  const pool=tasks.filter(t=>(filter==='Все темы'||t.topic===filter)&&(mode!=='Production'||t.production));
