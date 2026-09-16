@@ -1,0 +1,1209 @@
+[
+  {
+    "id": "unique",
+    "topic": "Collections",
+    "title": "События без дублей",
+    "description": "Webhook может прийти несколько раз. Реализуйте unique_events(events): оставьте первое событие с каждым уникальным id. Сохраните порядок. id — целое число или строка, ключ есть у каждого события.",
+    "starter": "def unique_events(events: list[dict]) -> list[dict]:\n    # Верните события без повторяющихся id\n    pass\n",
+    "tests": [
+      {
+        "name": "Обычные события",
+        "check": "unique_events([{'id':1},{'id':2}]) == [{'id':1},{'id':2}]"
+      },
+      {
+        "name": "Повторяющийся id",
+        "check": "unique_events([{'id':1,'v':'a'},{'id':1,'v':'b'}]) == [{'id':1,'v':'a'}]"
+      },
+      {
+        "name": "Пустой список",
+        "check": "unique_events([]) == []"
+      },
+      {
+        "name": "Порядок и строковые id",
+        "check": "unique_events([{'id':'b'},{'id':'a'},{'id':'b'}]) == [{'id':'b'},{'id':'a'}]"
+      },
+      {
+        "name": "Исходный список не изменён",
+        "check": "x=[{'id':1},{'id':1}]; unique_events(x); assert x == [{'id':1},{'id':1}]"
+      }
+    ],
+    "hints": [
+      "Как запомнить, какие id уже встретились?",
+      "Множество удобно для проверки наличия. Отдельный список сохранит порядок.",
+      "Добавляйте событие в результат только при первом появлении id. Затем отмечайте этот id как встреченный."
+    ],
+    "theory": "Множество проверяет наличие в среднем за O(1). Один проход и множество дают O(n) по времени и O(n) дополнительной памяти.",
+    "level": 1,
+    "production": true,
+    "example": "Вход:  [{\"id\": 1, \"type\": \"created\"},\n        {\"id\": 2, \"type\": \"paid\"},\n        {\"id\": 1, \"type\": \"retry\"}]\n\nВыход: [{\"id\": 1, \"type\": \"created\"},\n        {\"id\": 2, \"type\": \"paid\"}]",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "group",
+    "topic": "Collections",
+    "title": "Сгруппировать заказы",
+    "description": "Напишите group_orders(orders): верните словарь user_id → сумма amount. amount — целое число, возвраты представлены отрицательными значениями.",
+    "starter": "def group_orders(orders: list[dict]) -> dict:\n    pass\n",
+    "tests": [
+      {
+        "name": "Суммирование",
+        "check": "group_orders([{'user_id':1,'amount':20},{'user_id':1,'amount':5}]) == {1:25}"
+      },
+      {
+        "name": "Разные пользователи",
+        "check": "group_orders([{'user_id':2,'amount':4},{'user_id':1,'amount':8}]) == {2:4,1:8}"
+      },
+      {
+        "name": "Возврат",
+        "check": "group_orders([{'user_id':1,'amount':10},{'user_id':1,'amount':-4}]) == {1:6}"
+      },
+      {
+        "name": "Пустой ввод",
+        "check": "group_orders([]) == {}"
+      }
+    ],
+    "hints": [
+      "Вам нужен накопитель на каждый user_id.",
+      "У отсутствующего ключа начальная сумма равна нулю."
+    ],
+    "theory": "dict.get(key, default) позволяет задать значение при первом появлении ключа.",
+    "level": 2,
+    "production": true,
+    "example": "[{\"user_id\": 7, \"amount\": 20},\n {\"user_id\": 7, \"amount\": 5}] → {7: 25}",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "normalize",
+    "topic": "Python core",
+    "title": "Нормализация идентификаторов",
+    "description": "Напишите normalize_ids(values): оставьте строки, уберите пробелы по краям и приведите к нижнему регистру. Пустые результаты и нестроковые значения пропустите. Дубли сохраните.",
+    "starter": "def normalize_ids(values: list) -> list[str]:\n    pass\n",
+    "tests": [
+      {
+        "name": "Пробелы и регистр",
+        "check": "normalize_ids([' A ', 'B']) == ['a','b']"
+      },
+      {
+        "name": "Разные типы",
+        "check": "normalize_ids([None,1,True,' C ']) == ['c']"
+      },
+      {
+        "name": "Пустые строки",
+        "check": "normalize_ids(['','  ', ' x ']) == ['x']"
+      },
+      {
+        "name": "Дубли",
+        "check": "normalize_ids(['A','a']) == ['a','a']"
+      }
+    ],
+    "hints": [
+      "Сначала проверьте тип значения.",
+      "У строк есть методы strip и lower."
+    ],
+    "theory": "isinstance защищает от вызова строковых методов на None и числах. Проверять тип нужно до преобразования.",
+    "level": 1,
+    "production": false,
+    "example": "[' A ', None, ' ', 'B'] → ['a', 'b']",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "chunks",
+    "topic": "Python core",
+    "title": "Пакеты для API",
+    "description": "Реализуйте chunks(items, size), возвращающую список списков размером не более size. Последний пакет может быть короче. При size <= 0 выбросьте ValueError.",
+    "starter": "def chunks(items: list, size: int) -> list[list]:\n    pass\n",
+    "tests": [
+      {
+        "name": "Обычные пакеты",
+        "check": "chunks([1,2,3,4,5],2) == [[1,2],[3,4],[5]]"
+      },
+      {
+        "name": "Пустой ввод",
+        "check": "chunks([],3) == []"
+      },
+      {
+        "name": "Большой пакет",
+        "check": "chunks([1,2],9) == [[1,2]]"
+      },
+      {
+        "name": "Нулевой размер",
+        "check": "try:\n    chunks([1],0)\nexcept ValueError:\n    pass\nelse:\n    raise AssertionError('Ожидался ValueError')"
+      }
+    ],
+    "hints": [
+      "Срез списка позволяет получить пакет.",
+      "Шаг range можно задать равным size."
+    ],
+    "theory": "Срез items[a:b] включает a и не включает b. Проверяйте предусловия перед циклом.",
+    "level": 2,
+    "production": true,
+    "example": "chunks([1, 2, 3, 4, 5], 2)\n→ [[1, 2], [3, 4], [5]]",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "defaults",
+    "topic": "Functions",
+    "title": "Без общего состояния",
+    "description": "Исправьте add_tag(tag, tags=None). Функция возвращает новый список с добавленным тегом. Переданный список не изменяется. Повторные вызовы без tags независимы.",
+    "starter": "def add_tag(tag: str, tags=None) -> list[str]:\n    pass\n",
+    "tests": [
+      {
+        "name": "Без списка",
+        "check": "add_tag('api') == ['api']"
+      },
+      {
+        "name": "Изоляция вызовов",
+        "check": "add_tag('a'); assert add_tag('b') == ['b']"
+      },
+      {
+        "name": "Сохранение исходного",
+        "check": "x=['a']; y=add_tag('b',x); assert x == ['a'] and y == ['a','b'] and y is not x"
+      },
+      {
+        "name": "Пустой тег",
+        "check": "add_tag('',[]) == ['']"
+      }
+    ],
+    "hints": [
+      "None помогает отличить отсутствие аргумента.",
+      "Создайте копию списка перед добавлением."
+    ],
+    "theory": "Изменяемый аргумент по умолчанию создаётся один раз при определении функции. None и копирование исключают утечку состояния.",
+    "level": 1,
+    "production": false,
+    "example": "add_tag('api', ['backend'])\n→ ['backend', 'api']",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "compose",
+    "topic": "Functions",
+    "title": "Конвейер преобразований",
+    "description": "Реализуйте pipeline(value, *functions). Применяйте функции слева направо. Без функций верните исходное значение. Исключения должны передаваться вызывающему коду.",
+    "starter": "def pipeline(value, *functions):\n    pass\n",
+    "tests": [
+      {
+        "name": "Порядок",
+        "check": "pipeline(3,lambda x:x+1,lambda x:x*2) == 8"
+      },
+      {
+        "name": "Без функций",
+        "check": "pipeline(5) == 5"
+      },
+      {
+        "name": "Смена типа",
+        "check": "pipeline('12',int,lambda x:x+3) == 15"
+      },
+      {
+        "name": "Исключения",
+        "check": "try:\n    pipeline('x',int)\nexcept ValueError:\n    pass\nelse:\n    raise AssertionError('Исключение потеряно')"
+      }
+    ],
+    "hints": [
+      "Храните текущий результат между вызовами.",
+      "*functions — кортеж переданных функций."
+    ],
+    "theory": "Функции — объекты первого класса: их можно передавать, хранить и вызывать внутри другой функции.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "parse",
+    "topic": "Exceptions",
+    "title": "Надёжный разбор чисел",
+    "description": "Реализуйте parse_int(value, default=0). Преобразуйте value через int. При TypeError или ValueError верните default. Другие исключения не подавляйте.",
+    "starter": "def parse_int(value, default=0):\n    pass\n",
+    "tests": [
+      {
+        "name": "Число строкой",
+        "check": "parse_int('42') == 42"
+      },
+      {
+        "name": "Неверный формат",
+        "check": "parse_int('x',-1) == -1"
+      },
+      {
+        "name": "None",
+        "check": "parse_int(None,9) == 9"
+      },
+      {
+        "name": "Отрицательное число",
+        "check": "parse_int('-7') == -7"
+      },
+      {
+        "name": "Не подавлять RuntimeError",
+        "check": "class Bad:\n    def __int__(self): raise RuntimeError('сбой')\ntry:\n    parse_int(Bad())\nexcept RuntimeError:\n    pass\nelse:\n    raise AssertionError('RuntimeError подавлен')"
+      }
+    ],
+    "hints": [
+      "try должен охватывать только преобразование.",
+      "Можно указать кортеж из двух типов исключений."
+    ],
+    "theory": "Ловите конкретные исключения. except Exception часто скрывает ошибки, которые нужно исправлять.",
+    "level": 1,
+    "production": true,
+    "example": "parse_int('42') → 42\nparse_int(None, default=-1) → -1",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "retry",
+    "topic": "External failures",
+    "title": "Повтор после временного сбоя",
+    "description": "Реализуйте retry(call, attempts=3). Вызывайте call без аргументов до успеха. Повторяйте только при TimeoutError. После attempts неудач пробросьте последнее исключение. attempts <= 0 → ValueError. В этой задаче задержки не нужны.",
+    "starter": "def retry(call, attempts: int = 3):\n    pass\n",
+    "tests": [
+      {
+        "name": "Успех сразу",
+        "check": "assert retry(lambda:42) == 42"
+      },
+      {
+        "name": "Успех после сбоя",
+        "check": "calls=[]\ndef f():\n    calls.append(1)\n    if len(calls)<3: raise TimeoutError('slow')\n    return 'ok'\nassert retry(f,3) == 'ok' and len(calls)==3"
+      },
+      {
+        "name": "Лимит попыток",
+        "check": "calls=[]\ndef f():\n    calls.append(1)\n    raise TimeoutError()\ntry:\n    retry(f,2)\nexcept TimeoutError:\n    assert len(calls)==2\nelse:\n    raise AssertionError('Ожидался TimeoutError')"
+      },
+      {
+        "name": "Чужая ошибка",
+        "check": "def f(): raise KeyError('key')\ntry:\n    retry(f)\nexcept KeyError: pass\nelse: raise AssertionError('KeyError потерян')"
+      },
+      {
+        "name": "Валидация",
+        "check": "try:\n    retry(lambda:1,0)\nexcept ValueError: pass\nelse: raise AssertionError('Ожидался ValueError')"
+      }
+    ],
+    "hints": [
+      "Разделите временный сбой и остальные ошибки.",
+      "На последней попытке используйте raise внутри except, чтобы сохранить исключение."
+    ],
+    "theory": "В production повтор безопасен только при идемпотентной операции. Обычно нужны timeout, backoff и jitter. Повтор без лимита создаёт дополнительную нагрузку.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "counter",
+    "topic": "OOP",
+    "title": "Счётчик запросов",
+    "description": "Создайте класс Counter с методами increment(key) и snapshot(). increment увеличивает счётчик ключа и возвращает новое значение. snapshot возвращает независимую копию словаря. Экземпляры не разделяют состояние.",
+    "starter": "class Counter:\n    def __init__(self):\n        pass\n\n    def increment(self, key: str) -> int:\n        pass\n\n    def snapshot(self) -> dict:\n        pass\n",
+    "tests": [
+      {
+        "name": "Инкремент",
+        "check": "c=Counter(); assert c.increment('a') == 1 and c.increment('a') == 2"
+      },
+      {
+        "name": "Новый ключ",
+        "check": "c=Counter(); c.increment('a'); assert c.increment('b') == 1"
+      },
+      {
+        "name": "Изоляция экземпляров",
+        "check": "a=Counter(); a.increment('x'); assert Counter().snapshot() == {}"
+      },
+      {
+        "name": "Копия",
+        "check": "c=Counter(); c.increment('a'); d=c.snapshot(); d['a']=99; assert c.snapshot() == {'a':1}"
+      }
+    ],
+    "hints": [
+      "Создавайте словарь в __init__, а не на уровне класса.",
+      "snapshot не должен возвращать сам внутренний словарь."
+    ],
+    "theory": "Атрибуты экземпляра принадлежат объекту; изменяемые атрибуты класса могут непреднамеренно разделяться.",
+    "level": 1,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "cache",
+    "topic": "OOP",
+    "title": "Кэш с ограничением",
+    "description": "Реализуйте FIFOCache(capacity): put(key,value) и get(key). При превышении capacity удаляется самый давно добавленный ключ. Обновление существующего ключа не меняет его положение. get отсутствующего ключа → None, capacity <= 0 → ValueError.",
+    "starter": "class FIFOCache:\n    def __init__(self, capacity: int):\n        pass\n\n    def put(self, key, value):\n        pass\n\n    def get(self, key):\n        pass\n",
+    "tests": [
+      {
+        "name": "Чтение",
+        "check": "c=FIFOCache(2); c.put('a',1); assert c.get('a')==1 and c.get('z') is None"
+      },
+      {
+        "name": "Вытеснение",
+        "check": "c=FIFOCache(2); c.put('a',1); c.put('b',2); c.put('c',3); assert c.get('a') is None and c.get('b')==2"
+      },
+      {
+        "name": "Обновление",
+        "check": "c=FIFOCache(2); c.put('a',1); c.put('b',2); c.put('a',9); c.put('c',3); assert c.get('a') is None and c.get('b')==2"
+      },
+      {
+        "name": "Валидация",
+        "check": "try:\n    FIFOCache(0)\nexcept ValueError: pass\nelse: raise AssertionError('Ожидался ValueError')"
+      }
+    ],
+    "hints": [
+      "dict сохраняет порядок вставки.",
+      "Первый ключ можно получить через next(iter(...))."
+    ],
+    "theory": "FIFO учитывает порядок добавления, LRU — использования. Уточнение контракта важнее выбора модной структуры.",
+    "level": 3,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "generator",
+    "topic": "Iterators / generators",
+    "title": "Ленивая обработка строк",
+    "description": "Реализуйте nonempty(lines) как генератор: удаляйте пробелы по краям каждой строки и выдавайте только непустые. Не читайте вход заранее: он может быть бесконечным.",
+    "starter": "def nonempty(lines):\n    pass\n",
+    "tests": [
+      {
+        "name": "Строки",
+        "check": "list(nonempty([' a ','',' b '])) == ['a','b']"
+      },
+      {
+        "name": "Пробелы",
+        "check": "list(nonempty(['  ','\t','x'])) == ['x']"
+      },
+      {
+        "name": "Именно итератор",
+        "check": "g=nonempty(['a']); assert iter(g) is g and next(g)=='a'"
+      },
+      {
+        "name": "Ленивость",
+        "check": "seen=[]\ndef src():\n    for x in ['a','b','c']:\n        seen.append(x)\n        yield x\ng=nonempty(src()); assert seen==[]; assert next(g)=='a' and seen==['a']"
+      }
+    ],
+    "hints": [
+      "yield выдаёт значение, сохраняя состояние цикла.",
+      "Не превращайте lines в список."
+    ],
+    "theory": "Генератор вычисляет элементы по запросу. Это позволяет обрабатывать большие потоки с ограниченной памятью.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "take",
+    "topic": "Iterators / generators",
+    "title": "Первые N элементов",
+    "description": "Напишите take(iterator, n): верните список из не более n элементов. При n <= 0 верните []. Не считывайте лишний элемент после n.",
+    "starter": "def take(iterator, n: int) -> list:\n    pass\n",
+    "tests": [
+      {
+        "name": "Ограничение",
+        "check": "take(iter([1,2,3]),2)==[1,2]"
+      },
+      {
+        "name": "Короткий поток",
+        "check": "take(iter([1]),4)==[1]"
+      },
+      {
+        "name": "Нулевой лимит",
+        "check": "it=iter([1,2]); assert take(it,0)==[] and next(it)==1"
+      },
+      {
+        "name": "Без лишнего чтения",
+        "check": "it=iter([1,2,3]); assert take(it,2)==[1,2] and next(it)==3"
+      }
+    ],
+    "hints": [
+      "Двигайте итератор не более n раз.",
+      "Окончание итератора сигнализируется StopIteration. Также подходит itertools.islice."
+    ],
+    "theory": "Потребление итератора необратимо. Даже проверка с лишним next может потерять данные.",
+    "level": 2,
+    "production": false,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "decorator",
+    "topic": "Decorators",
+    "title": "Сохранить контракт функции",
+    "description": "Напишите декоратор nonnegative: он вызывает функцию и выбрасывает ValueError, если её числовой результат < 0. Сохраните __name__ и __doc__ исходной функции, поддержите args и kwargs.",
+    "starter": "from functools import wraps\n\ndef nonnegative(func):\n    pass\n",
+    "tests": [
+      {
+        "name": "Результат",
+        "check": "@nonnegative\ndef f(x): return x\nassert f(3)==3 and f(0)==0"
+      },
+      {
+        "name": "Ошибка",
+        "check": "@nonnegative\ndef f(): return -1\ntry: f()\nexcept ValueError: pass\nelse: raise AssertionError('Ожидался ValueError')"
+      },
+      {
+        "name": "kwargs",
+        "check": "@nonnegative\ndef f(x=1): return x\nassert f(x=7)==7"
+      },
+      {
+        "name": "Метаданные",
+        "check": "@nonnegative\ndef original():\n    'Описание'\n    return 1\nassert original.__name__=='original' and original.__doc__=='Описание'"
+      }
+    ],
+    "hints": [
+      "Декоратор возвращает обёртку, которая вызывает func.",
+      "functools.wraps копирует метаданные."
+    ],
+    "theory": "Обёртка с *args и **kwargs сохраняет гибкость вызова. wraps важен для introspection, документации и инструментов.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "typing",
+    "topic": "Typing",
+    "title": "Типизированная граница",
+    "description": "Создайте TypedDict User с обязательными полями id: int и name: str. Реализуйте make_user(user_id: int, name: str) -> User: обрежьте пробелы у name. Пустое имя → ValueError.",
+    "starter": "from typing import TypedDict\n\nclass User(TypedDict):\n    pass\n\ndef make_user(user_id: int, name: str) -> User:\n    pass\n",
+    "tests": [
+      {
+        "name": "Результат",
+        "check": "make_user(1,' Ada ') == {'id':1,'name':'Ada'}"
+      },
+      {
+        "name": "Пустое имя",
+        "check": "try: make_user(1,'  ')\nexcept ValueError: pass\nelse: raise AssertionError('Ожидался ValueError')"
+      },
+      {
+        "name": "Типы полей",
+        "check": "from typing import get_type_hints, is_typeddict\nassert is_typeddict(User) and get_type_hints(User)=={'id':int,'name':str}"
+      },
+      {
+        "name": "Аннотации функции",
+        "check": "from typing import get_type_hints\nassert get_type_hints(make_user)=={'user_id':int,'name':str,'return':User}"
+      }
+    ],
+    "hints": [
+      "TypedDict описывает ключи словаря, а не новый runtime-объект.",
+      "Аннотации не заменяют проверку пустого имени."
+    ],
+    "theory": "Типизация помогает обнаружить ошибки до запуска. TypedDict не валидирует данные автоматически: бизнес-ограничения остаются в коде.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "async",
+    "topic": "Async",
+    "title": "Параллельный сбор",
+    "description": "Напишите async gather_values(fetch, ids). Вызовите async-функцию fetch(id) для каждого id конкурентно и верните результаты в исходном порядке. Пустой ids → []. Исключения не подавляйте.",
+    "starter": "import asyncio\n\nasync def gather_values(fetch, ids: list) -> list:\n    pass\n",
+    "tests": [
+      {
+        "name": "Результаты и порядок",
+        "check": "async def f(x):\n    await asyncio.sleep(0)\n    return x*2\nassert await gather_values(f,[3,1,2]) == [6,2,4]"
+      },
+      {
+        "name": "Пустой ввод",
+        "check": "async def f(x): return x\nassert await gather_values(f,[]) == []"
+      },
+      {
+        "name": "Конкурентность",
+        "check": "started=[]\nevent=asyncio.Event()\nasync def f(x):\n    started.append(x)\n    if len(started)==3: event.set()\n    await asyncio.wait_for(event.wait(),.8)\n    return x\nassert await gather_values(f,[1,2,3])==[1,2,3]"
+      },
+      {
+        "name": "Передача ошибки",
+        "check": "async def f(x): raise ValueError('bad')\ntry: await gather_values(f,[1])\nexcept ValueError: pass\nelse: raise AssertionError('Ошибка подавлена')"
+      }
+    ],
+    "hints": [
+      "Последовательный await в цикле не запускает задачи конкурентно.",
+      "asyncio.gather сохраняет порядок результатов согласно порядку аргументов."
+    ],
+    "theory": "Async ускоряет ожидание I/O, а не CPU-вычисления. Конкурентность в production стоит ограничивать семафором.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "semaphore",
+    "topic": "Async",
+    "title": "Ограничить нагрузку",
+    "description": "Реализуйте async limited_map(fetch, ids, limit): конкурентно выполните fetch для всех id, но не более limit одновременно. Сохраните порядок результатов. limit <= 0 → ValueError.",
+    "starter": "import asyncio\n\nasync def limited_map(fetch, ids, limit: int):\n    pass\n",
+    "tests": [
+      {
+        "name": "Порядок",
+        "check": "async def f(x): await asyncio.sleep(0); return x*2\nassert await limited_map(f,[3,1,2],2)==[6,2,4]"
+      },
+      {
+        "name": "Ограничение",
+        "check": "active=0; peak=0\nasync def f(x):\n    global active,peak\n    active+=1; peak=max(peak,active)\n    await asyncio.sleep(.02)\n    active-=1\n    return x\nassert await limited_map(f,list(range(5)),2)==list(range(5))\nassert peak==2"
+      },
+      {
+        "name": "Пустой ввод",
+        "check": "async def f(x): return x\nassert await limited_map(f,[],2)==[]"
+      },
+      {
+        "name": "Валидация",
+        "check": "try: await limited_map(None,[],0)\nexcept ValueError: pass\nelse: raise AssertionError('Ожидался ValueError')"
+      }
+    ],
+    "hints": [
+      "Семафор ограничивает число одновременно вошедших в блок задач.",
+      "Оборачивайте именно await fetch(id) в async with semaphore."
+    ],
+    "theory": "Ограничение конкурентности защищает внешние API и пул соединений. Семафор не является ограничителем запросов в секунду.",
+    "level": 3,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "testing",
+    "topic": "Testing",
+    "title": "Тест, который ловит баг",
+    "description": "Напишите check_unique(fn), которая проверяет функцию удаления дублей из списка чисел с сохранением порядка. Если поведение неверно — AssertionError, иначе None. Проверьте пустой ввод, порядок, повторы и отсутствие изменения исходного списка. Проверим ваш тест на правильной и ошибочных реализациях.",
+    "starter": "def check_unique(fn):\n    # Вызовите fn на разных входах и проверьте результат\n    pass\n",
+    "tests": [
+      {
+        "name": "Верная реализация проходит",
+        "check": "def ok(x): return list(dict.fromkeys(x))\nassert check_unique(ok) is None"
+      },
+      {
+        "name": "Ловит возврат исходного списка",
+        "check": "try: check_unique(lambda x:x)\nexcept AssertionError: pass\nelse: raise AssertionError('Ваш тест пропустил дубли')"
+      },
+      {
+        "name": "Ловит потерю порядка",
+        "check": "try: check_unique(lambda x:sorted(set(x)))\nexcept AssertionError: pass\nelse: raise AssertionError('Добавьте несортированный вход')"
+      },
+      {
+        "name": "Ловит порчу входа",
+        "check": "def bad(x):\n    result=list(dict.fromkeys(x)); x.clear(); return result\ntry: check_unique(bad)\nexcept AssertionError: pass\nelse: raise AssertionError('Проверьте исходный список после вызова')"
+      },
+      {
+        "name": "Ловит ошибку на пустом",
+        "check": "def bad(x): return [0] if not x else list(dict.fromkeys(x))\ntry: check_unique(bad)\nexcept AssertionError: pass\nelse: raise AssertionError('Проверьте пустой список')"
+      }
+    ],
+    "hints": [
+      "Тест полезен, когда он падает на правдоподобном баге.",
+      "Используйте неотсортированный список с повторами, а копию входа сохраните заранее."
+    ],
+    "theory": "Mutation testing проверяет качество тестов на намеренно сломанных реализациях. Тестировать только счастливый путь недостаточно.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "http",
+    "topic": "HTTP / FastAPI",
+    "title": "Политика повторов HTTP",
+    "description": "Реализуйте should_retry(method, status). Повтор разрешён только для GET, HEAD, PUT, DELETE (регистр не важен) при статусах 429, 502, 503, 504. Остальные комбинации → False.",
+    "starter": "def should_retry(method: str, status: int) -> bool:\n    pass\n",
+    "tests": [
+      {
+        "name": "Временный сбой",
+        "check": "should_retry('GET',503) is True"
+      },
+      {
+        "name": "POST не повторять",
+        "check": "should_retry('POST',503) is False"
+      },
+      {
+        "name": "Успех и клиентские ошибки",
+        "check": "all(should_retry('GET',s) is False for s in [200,400,404,500])"
+      },
+      {
+        "name": "Регистр",
+        "check": "should_retry('put',429) is True"
+      },
+      {
+        "name": "Методы и статусы",
+        "check": "all(should_retry(m,s) for m in ['HEAD','DELETE'] for s in [502,504])"
+      }
+    ],
+    "hints": [
+      "Отдельно проверьте допустимый метод и статус.",
+      "Нормализуйте method через upper."
+    ],
+    "theory": "Идемпотентность означает одинаковый эффект повторных запросов. POST требует отдельного idempotency key или явного контракта.",
+    "level": 1,
+    "production": true,
+    "example": "should_retry('GET', 503) → True\nshould_retry('POST', 503) → False",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "fastapi",
+    "topic": "HTTP / FastAPI",
+    "title": "Первый endpoint",
+    "description": "Создайте FastAPI-приложение app и GET /health, возвращающий {\"status\": \"ok\"}. Создайте GET /square/{value} с параметром value: int. Ответ {\"result\": value * value}. Невалидное число должно дать 422. Сервер запускать не нужно: тесты вызывают приложение через ASGI. Используйте async def для endpoint: среда браузера не поддерживает потоки для синхронных обработчиков.",
+    "starter": "from fastapi import FastAPI\n\napp = FastAPI()\n\n# Определите два endpoint\n",
+    "tests": [
+      {
+        "name": "Health",
+        "check": "import httpx\nasync with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://test') as c:\n    r=await c.get('/health'); assert r.status_code==200 and r.json()=={'status':'ok'}"
+      },
+      {
+        "name": "Квадрат",
+        "check": "import httpx\nasync with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://test') as c:\n    r=await c.get('/square/4'); assert r.json()=={'result':16}"
+      },
+      {
+        "name": "Отрицательное число",
+        "check": "import httpx\nasync with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://test') as c:\n    r=await c.get('/square/-3'); assert r.json()=={'result':9}"
+      },
+      {
+        "name": "Валидация 422",
+        "check": "import httpx\nasync with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://test') as c:\n    r=await c.get('/square/no'); assert r.status_code==422"
+      }
+    ],
+    "hints": [
+      "@app.get задаёт маршрут.",
+      "Аннотация параметра value: int включает автоматическую валидацию FastAPI."
+    ],
+    "theory": "FastAPI использует аннотации для валидации и OpenAPI. ASGITransport позволяет тестировать HTTP-контракт без сетевого сервера.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Endpoint должны быть асинхронными (async def).",
+      "Тесты выполняются через настоящий ASGITransport."
+    ],
+    "language": "python",
+    "packages": [
+      "fastapi",
+      "httpx"
+    ]
+  },
+  {
+    "id": "result",
+    "topic": "External failures",
+    "title": "Не потерять частичный результат",
+    "description": "Реализуйте process_batch(items, process): для каждого элемента вызовите process(item). Верните {\"ok\": [успешные результаты], \"errors\": [{\"item\": элемент, \"error\": текст ошибки}]}. Ловите ValueError и TimeoutError, остальные ошибки пробрасывайте.",
+    "starter": "def process_batch(items, process) -> dict:\n    pass\n",
+    "tests": [
+      {
+        "name": "Успех",
+        "check": "process_batch([1,2],lambda x:x*2)=={'ok':[2,4],'errors':[]}"
+      },
+      {
+        "name": "Частичный сбой",
+        "check": "def f(x):\n    if x==2: raise TimeoutError('slow')\n    return x*2\nassert process_batch([1,2,3],f)=={'ok':[2,6],'errors':[{'item':2,'error':'slow'}]}"
+      },
+      {
+        "name": "Пустой ввод",
+        "check": "process_batch([],None)=={'ok':[],'errors':[]}"
+      },
+      {
+        "name": "Не подавлять неожиданные ошибки",
+        "check": "def f(x): raise RuntimeError('crash')\ntry: process_batch([1],f)\nexcept RuntimeError: pass\nelse: raise AssertionError('Ошибка подавлена')"
+      }
+    ],
+    "hints": [
+      "Исключение одного элемента не должно прерывать цикл.",
+      "try/except нужно разместить внутри цикла."
+    ],
+    "theory": "Явное разделение успехов и ошибок даёт наблюдаемость и позволяет повторять только неудавшиеся элементы.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "validate",
+    "topic": "Exceptions",
+    "title": "Контракт входных данных",
+    "description": "Реализуйте validate_limit(value). Допустим int от 1 до 100 включительно. bool недопустим (хотя наследует int). Неверный тип → TypeError; число за границами → ValueError. Верните допустимое значение.",
+    "starter": "def validate_limit(value) -> int:\n    pass\n",
+    "tests": [
+      {
+        "name": "Границы",
+        "check": "validate_limit(1)==1 and validate_limit(100)==100"
+      },
+      {
+        "name": "bool",
+        "check": "try: validate_limit(True)\nexcept TypeError: pass\nelse: raise AssertionError('bool не допускается')"
+      },
+      {
+        "name": "Строка",
+        "check": "try: validate_limit('3')\nexcept TypeError: pass\nelse: raise AssertionError('Ожидался TypeError')"
+      },
+      {
+        "name": "Диапазон",
+        "check": "for x in [0,101,-1]:\n    try: validate_limit(x)\n    except ValueError: pass\n    else: raise AssertionError('Ожидался ValueError')"
+      }
+    ],
+    "hints": [
+      "isinstance(True, int) возвращает True.",
+      "Можно проверять точный type или отдельно исключить bool."
+    ],
+    "theory": "Тип и значение — разные уровни валидации. Явные ошибки помогают вызывающему коду правильно реагировать.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Не изменяйте входные данные.",
+      "Учтите пустой ввод и граничные случаи."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "sql-filter",
+    "topic": "PostgreSQL / SQL",
+    "title": "Оплаченные заказы",
+    "description": "Выберите id и amount только оплаченных заказов (status = paid). Отсортируйте по id по возрастанию.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {
+        "name": "Основной набор",
+        "setup": "CREATE TABLE orders (id int, user_id int, amount int, status text); INSERT INTO orders VALUES (1,1,100,'paid'),(2,1,50,'pending'),(3,2,200,'paid'),(4,2,30,'paid'),(5,3,10,'refunded');",
+        "expected": [
+          {
+            "id": 1,
+            "amount": 100
+          },
+          {
+            "id": 3,
+            "amount": 200
+          },
+          {
+            "id": 4,
+            "amount": 30
+          }
+        ]
+      },
+      {
+        "name": "Другие данные",
+        "setup": "CREATE TABLE orders (id int, user_id int, amount int, status text); INSERT INTO orders VALUES (1,4,7,'paid'),(2,4,3,'paid'),(3,9,20,'pending'),(4,2,5,'paid');",
+        "expected": [
+          {
+            "id": 1,
+            "amount": 7
+          },
+          {
+            "id": 2,
+            "amount": 3
+          },
+          {
+            "id": 4,
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "name": "Пустая таблица",
+        "setup": "CREATE TABLE orders (id int, user_id int, amount int, status text);",
+        "expected": []
+      }
+    ],
+    "hints": [
+      "Сначала определите, какие строки должны попасть в результат.",
+      "Отфильтруйте status через WHERE, затем отсортируйте по id."
+    ],
+    "theory": "WHERE фильтрует строки до группировки. GROUP BY объединяет строки, HAVING фильтрует группы. ORDER BY задаёт предсказуемый порядок.",
+    "level": 1,
+    "production": true,
+    "example": "orders(id int, user_id int, amount int, status text)\n\n1 | 1 | 100 | paid\n2 | 1 |  50 | pending\n3 | 2 | 200 | paid\n4 | 2 |  30 | paid\n5 | 3 |  10 | refunded",
+    "constraints": [
+      "Только SELECT или WITH … SELECT.",
+      "Проверяются имена столбцов, значения и порядок строк."
+    ],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "sql-group",
+    "topic": "PostgreSQL / SQL",
+    "title": "Выручка по пользователям",
+    "description": "Посчитайте сумму amount оплаченных заказов каждого user_id. Столбцы: user_id, total. Сортировка total по убыванию, затем user_id по возрастанию.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {
+        "name": "Основной набор",
+        "setup": "CREATE TABLE orders (id int, user_id int, amount int, status text); INSERT INTO orders VALUES (1,1,100,'paid'),(2,1,50,'pending'),(3,2,200,'paid'),(4,2,30,'paid'),(5,3,10,'refunded');",
+        "expected": [
+          {
+            "user_id": 2,
+            "total": 230
+          },
+          {
+            "user_id": 1,
+            "total": 100
+          }
+        ]
+      },
+      {
+        "name": "Другие данные",
+        "setup": "CREATE TABLE orders (id int, user_id int, amount int, status text); INSERT INTO orders VALUES (1,4,7,'paid'),(2,4,3,'paid'),(3,9,20,'pending'),(4,2,5,'paid');",
+        "expected": [
+          {
+            "user_id": 4,
+            "total": 10
+          },
+          {
+            "user_id": 2,
+            "total": 5
+          }
+        ]
+      },
+      {
+        "name": "Пустая таблица",
+        "setup": "CREATE TABLE orders (id int, user_id int, amount int, status text);",
+        "expected": []
+      }
+    ],
+    "hints": [
+      "Сначала определите, какие строки должны попасть в результат.",
+      "После WHERE сгруппируйте строки по user_id и примените SUM(amount)."
+    ],
+    "theory": "WHERE фильтрует строки до группировки. GROUP BY объединяет строки, HAVING фильтрует группы. ORDER BY задаёт предсказуемый порядок.",
+    "level": 2,
+    "production": true,
+    "example": "orders(id int, user_id int, amount int, status text)\n\n1 | 1 | 100 | paid\n2 | 1 |  50 | pending\n3 | 2 | 200 | paid\n4 | 2 |  30 | paid\n5 | 3 |  10 | refunded",
+    "constraints": [
+      "Только SELECT или WITH … SELECT.",
+      "Проверяются имена столбцов, значения и порядок строк."
+    ],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "sql-window",
+    "topic": "PostgreSQL / SQL",
+    "title": "Рейтинг заказов внутри клиента",
+    "description": "Для оплаченных заказов выведите id, user_id, amount, rn. rn — номер в группе пользователя по amount по убыванию, при равенстве по id. Итог отсортируйте по user_id, rn.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {
+        "name": "Основной набор",
+        "setup": "CREATE TABLE orders (id int, user_id int, amount int, status text); INSERT INTO orders VALUES (1,1,100,'paid'),(2,1,50,'pending'),(3,2,200,'paid'),(4,2,30,'paid'),(5,3,10,'refunded');",
+        "expected": [
+          {
+            "id": 1,
+            "user_id": 1,
+            "amount": 100,
+            "rn": 1
+          },
+          {
+            "id": 3,
+            "user_id": 2,
+            "amount": 200,
+            "rn": 1
+          },
+          {
+            "id": 4,
+            "user_id": 2,
+            "amount": 30,
+            "rn": 2
+          }
+        ]
+      },
+      {
+        "name": "Другие данные",
+        "setup": "CREATE TABLE orders (id int, user_id int, amount int, status text); INSERT INTO orders VALUES (1,4,7,'paid'),(2,4,3,'paid'),(3,9,20,'pending'),(4,2,5,'paid');",
+        "expected": [
+          {
+            "id": 4,
+            "user_id": 2,
+            "amount": 5,
+            "rn": 1
+          },
+          {
+            "id": 1,
+            "user_id": 4,
+            "amount": 7,
+            "rn": 1
+          },
+          {
+            "id": 2,
+            "user_id": 4,
+            "amount": 3,
+            "rn": 2
+          }
+        ]
+      },
+      {
+        "name": "Пустая таблица",
+        "setup": "CREATE TABLE orders (id int, user_id int, amount int, status text);",
+        "expected": []
+      }
+    ],
+    "hints": [
+      "Сначала определите, какие строки должны попасть в результат.",
+      "ROW_NUMBER() OVER (...) нумерует строки. PARTITION BY определяет группы."
+    ],
+    "theory": "WHERE фильтрует строки до группировки. GROUP BY объединяет строки, HAVING фильтрует группы. ORDER BY задаёт предсказуемый порядок.",
+    "level": 3,
+    "production": true,
+    "example": "orders(id int, user_id int, amount int, status text)\n\n1 | 1 | 100 | paid\n2 | 1 |  50 | pending\n3 | 2 | 200 | paid\n4 | 2 |  30 | paid\n5 | 3 |  10 | refunded",
+    "constraints": [
+      "Только SELECT или WITH … SELECT.",
+      "Проверяются имена столбцов, значения и порядок строк."
+    ],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "sql-join",
+    "topic": "PostgreSQL / SQL",
+    "title": "Клиенты без покупок тоже важны",
+    "description": "Таблицы users(id int, name text) и orders(id int, user_id int, amount int, status text). Верните user_id и total оплаченных заказов для КАЖДОГО пользователя, включая пользователей без заказов (total = 0). Сортируйте по user_id.",
+    "starter": "-- Напишите SELECT-запрос\n",
+    "tests": [
+      {
+        "name": "LEFT JOIN и нулевая выручка",
+        "setup": "CREATE TABLE users(id int, name text); INSERT INTO users VALUES (1,'Ada'),(2,'Lin'),(3,'Sam'); CREATE TABLE orders(id int,user_id int,amount int,status text); INSERT INTO orders VALUES (1,1,10,'paid'),(2,2,9,'pending'),(3,1,20,'paid');",
+        "expected": [
+          {
+            "user_id": 1,
+            "total": 30
+          },
+          {
+            "user_id": 2,
+            "total": 0
+          },
+          {
+            "user_id": 3,
+            "total": 0
+          }
+        ]
+      },
+      {
+        "name": "NULL и пустые заказы",
+        "setup": "CREATE TABLE users(id int,name text); INSERT INTO users VALUES(4,'Mia'); CREATE TABLE orders(id int,user_id int,amount int,status text); INSERT INTO orders VALUES(1,4,NULL,'paid');",
+        "expected": [
+          {
+            "user_id": 4,
+            "total": 0
+          }
+        ]
+      }
+    ],
+    "hints": [
+      "LEFT JOIN сохраняет пользователей без заказов.",
+      "Фильтр status в WHERE может убрать строки без совпадения. Разместите его в ON. Для NULL используйте COALESCE."
+    ],
+    "theory": "Условие на правую таблицу в WHERE может превратить LEFT JOIN в INNER JOIN по смыслу. COALESCE заменяет NULL, а не ноль.",
+    "level": 2,
+    "production": true,
+    "example": "users: 1 Ada, 2 Lin, 3 Sam\norders: (1, 1, 10, 'paid'), (2, 2, 9, 'pending')\n→ (1, 10), (2, 0), (3, 0)",
+    "constraints": [
+      "Не теряйте пользователей без оплаченных заказов.",
+      "Результат: user_id, total."
+    ],
+    "language": "sql",
+    "packages": []
+  },
+  {
+    "id": "memo",
+    "topic": "Decorators",
+    "title": "Кэширование чистой функции",
+    "description": "Напишите декоратор memoize для функции с одним хешируемым позиционным аргументом. Повторный вызов с тем же аргументом должен возвращать сохранённый результат, не вызывая исходную функцию. Не кэшируйте исключения, сохраните метаданные.",
+    "starter": "from functools import wraps\n\ndef memoize(func):\n    pass\n",
+    "tests": [
+      {
+        "name": "Кэш и None",
+        "check": "calls=[]\n@memoize\ndef f(x):\n    calls.append(x); return None\nassert f(1) is None and f(1) is None and calls==[1]"
+      },
+      {
+        "name": "Разные ключи",
+        "check": "@memoize\ndef f(x): return x*2\nassert f(2)==4 and f(3)==6"
+      },
+      {
+        "name": "Не кэшировать ошибку",
+        "check": "calls=[]\n@memoize\ndef f(x):\n    calls.append(x)\n    if len(calls)==1: raise ValueError()\n    return x\ntry: f(1)\nexcept ValueError: pass\nassert f(1)==1 and calls==[1,1]"
+      },
+      {
+        "name": "Метаданные",
+        "check": "@memoize\ndef source(x):\n    'doc'\n    return x\nassert source.__name__=='source' and source.__doc__=='doc'"
+      }
+    ],
+    "hints": [
+      "Кэш должен находиться в замыкании конкретной функции.",
+      "Проверяйте наличие ключа, а не истинность сохранённого значения."
+    ],
+    "theory": "Кэширование безопасно для чистых функций. В production нужны ограничение размера и политика устаревания.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Соблюдайте контракт на граничных случаях.",
+      "Сторонние библиотеки не нужны."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "protocol",
+    "topic": "Typing",
+    "title": "Контракт хранилища",
+    "description": "Создайте runtime_checkable Protocol с именем Store и методом get(self, key: str) -> str | None. Напишите read_or(store: Store, key: str, default: str) -> str: верните default только при None, а пустую строку сохраните.",
+    "starter": "from typing import Protocol, runtime_checkable\n\n# Опишите Store\n\ndef read_or(store, key, default):\n    pass\n",
+    "tests": [
+      {
+        "name": "Значение",
+        "check": "class S:\n    def get(self,key): return 'ok'\nassert read_or(S(),'x','fallback')=='ok'"
+      },
+      {
+        "name": "None и пустая строка",
+        "check": "class S:\n    def get(self,key): return None if key=='n' else ''\nassert read_or(S(),'n','fallback')=='fallback' and read_or(S(),'x','fallback')==''"
+      },
+      {
+        "name": "Протокол",
+        "check": "class S:\n    def get(self,key): return ''\nassert Store._is_protocol and isinstance(S(),Store)"
+      },
+      {
+        "name": "Аннотации",
+        "check": "from typing import get_type_hints\nassert get_type_hints(Store.get)=={'key':str,'return':str|None}\nassert get_type_hints(read_or)=={'store':Store,'key':str,'default':str,'return':str}"
+      }
+    ],
+    "hints": [
+      "Протокол описывает поведение, а не конкретную реализацию.",
+      "runtime_checkable разрешает isinstance. Аннотируйте также read_or."
+    ],
+    "theory": "Структурная типизация позволяет подменять Redis, БД и fake-store без общего базового класса. Runtime-проверка Protocol проверяет наличие атрибутов, а не типы значений.",
+    "level": 2,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Соблюдайте контракт на граничных случаях.",
+      "Сторонние библиотеки не нужны."
+    ],
+    "language": "python",
+    "packages": []
+  },
+  {
+    "id": "test-retry",
+    "topic": "Testing",
+    "title": "Проверить число повторов",
+    "description": "Напишите check_retry(fn), проверяющую функцию fn(call, attempts). Она повторяет только TimeoutError и возвращает успех. Проверьте успех сразу, восстановление после двух сбоев при attempts=3, точный лимит повторов и проброс ValueError. Неверная реализация → AssertionError. Иначе None.",
+    "starter": "def check_retry(fn):\n    pass\n",
+    "tests": [
+      {
+        "name": "Верная реализация",
+        "check": "def ok(call,attempts):\n    for i in range(attempts):\n        try: return call()\n        except TimeoutError:\n            if i==attempts-1: raise\nassert check_retry(ok) is None"
+      },
+      {
+        "name": "Ловит отсутствие повторов",
+        "check": "try: check_retry(lambda call,attempts:call())\nexcept AssertionError: pass\nelse: raise AssertionError('Не проверено восстановление')"
+      },
+      {
+        "name": "Ловит лишнюю попытку",
+        "check": "def bad(call,attempts):\n    for i in range(attempts+1):\n        try: return call()\n        except TimeoutError:\n            if i==attempts: raise\ntry: check_retry(bad)\nexcept AssertionError: pass\nelse: raise AssertionError('Не проверен точный лимит')"
+      },
+      {
+        "name": "Ловит подавление ValueError",
+        "check": "def bad(call,attempts):\n    for i in range(attempts):\n        try: return call()\n        except Exception:\n            if i==attempts-1: return None\ntry: check_retry(bad)\nexcept AssertionError: pass\nelse: raise AssertionError('Не проверен тип исключения')"
+      }
+    ],
+    "hints": [
+      "Счётчик вызовов нужен и для успеха, и для неудачи.",
+      "Преобразуйте неожиданные результаты или исключения тестируемой функции в AssertionError."
+    ],
+    "theory": "Тестируйте наблюдаемый контракт: возвращаемое значение, тип ошибки, число вызовов. Иначе retry может незаметно умножить внешние операции.",
+    "level": 3,
+    "production": true,
+    "example": "",
+    "constraints": [
+      "Соблюдайте контракт на граничных случаях.",
+      "Сторонние библиотеки не нужны."
+    ],
+    "language": "python",
+    "packages": []
+  }
+]
