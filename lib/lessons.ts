@@ -1,5 +1,6 @@
-export type Lesson = {topic:string;title:string;path:string;sections:{title:string;paragraphs:string[]}[];code:string;walkthrough:string[];question:string;reference:string;pitfall:string;taskId:string|null};
-export const lessons:Lesson[] = [
+import {coreUnits} from './core-course';
+export type Lesson = {id?:string;taskIds?:string[];topic:string;title:string;path:string;sections:{title:string;paragraphs:string[]}[];code:string;walkthrough:string[];question:string;reference:string;pitfall:string;taskId:string|null};
+const overviewLessons:Lesson[] = [
   {
     "topic": "Python core",
     "title": "Как Python исполняет программу",
@@ -495,3 +496,5 @@ export const lessons:Lesson[] = [
     "reference": "Ключ должен обозначать бизнес-операцию и повторно использоваться после тайм-аута. Получатель атомарно связывает ключ с операцией и сохраняет результат для повторных обращений. Локальный ключ без поддержки внешнего сервиса не предотвращает второй ticket: понадобится поиск результата или сверка по внешнему идентификатору."
   }
 ];
+
+export const lessons:Lesson[] = [...coreUnits,...overviewLessons.filter(l=>l.topic!=='Python core')];
