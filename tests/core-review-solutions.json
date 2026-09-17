@@ -1,0 +1,14 @@
+{
+  "core-values-review": "def resolve_timeout(value, default):\n    return default if value is None or value == '' else int(value)\n",
+  "core-operators-review": "def batch_count(total, size):\n    return (total + size - 1) // size\n",
+  "core-conditions-review": "def can_write(active, role, blocked):\n    return active and role in ('admin', 'editor') and not blocked\n",
+  "core-loops-review": "def longest_failure_streak(statuses):\n    best = current = 0\n    for status in statuses:\n        current = current + 1 if status >= 500 else 0\n        best = max(best, current)\n    return best\n",
+  "core-strings-review": "def parse_header(line):\n    name, value = line.split(':', 1)\n    return name.strip().lower(), value.strip()\n",
+  "core-sequences-review": "def tail_events(items, count):\n    return items[-count:] if count else []\n",
+  "core-comprehensions-review": "def rank_jobs(jobs):\n    return sorted(jobs, key=lambda job: job['priority'], reverse=True)\n",
+  "core-references-review": "def with_tag(config, tag):\n    return {**config, 'tags': config['tags'] + [tag]}\n",
+  "core-functions-review": "def mean_valid(values):\n    numbers = [v for v in values if v is not None]\n    return sum(numbers) / len(numbers) if numbers else None\n",
+  "core-modules-review": "def expires_on(text, days):\n    from datetime import date, timedelta\n    return (date.fromisoformat(text) + timedelta(days=days)).isoformat()\n",
+  "core-files-review": "def active_ids(stream):\n    import json\n    result = []\n    for line in stream:\n        if line.strip():\n            row = json.loads(line)\n            if row['active']:\n                result.append(row['id'])\n    return result\n",
+  "core-debugging-review": "def valid_ports(lines):\n    result = []\n    for line in lines:\n        text = line.strip()\n        if text and all('0' <= c <= '9' for c in text):\n            port = int(text)\n            if 1 <= port <= 65535:\n                result.append(port)\n    return result\n"
+}

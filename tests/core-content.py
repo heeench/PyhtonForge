@@ -3,6 +3,8 @@ import ast,json,io,contextlib
 from pathlib import Path
 course=json.loads(Path('lib/core-course.json').read_text())
 solutions=json.loads(Path('tests/core-solutions.json').read_text())
+course['tasks'] += json.loads(Path('lib/core-reviews.json').read_text())
+solutions.update(json.loads(Path('tests/core-review-solutions.json').read_text()))
 count=0
 for task in course['tasks']:
  for test in task['tests']:
@@ -27,4 +29,4 @@ for u in course['units']:
  with contextlib.redirect_stdout(io.StringIO()):exec(compile(u['code'],u['id'],'exec'),{})
  assert len(u['taskIds'])==3
  assert all(len(s['paragraphs'])>=2 for s in u['sections'])
-print(f'PASS: {count} checks, 36 no-op rejections, 12 executable lesson examples.')
+print(f"PASS: {count} checks, {len(course['tasks'])} no-op rejections, 12 executable lesson examples.")

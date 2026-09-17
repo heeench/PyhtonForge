@@ -27,7 +27,9 @@ assert.equal(coreProgress(unit,[...solved,win(unit.taskIds[2],100)],now+100).sta
 assert.equal(coreProgress(unit,[...solved,win(unit.taskIds[2],day+2,{session:solved[2].session})],now+day+2).status,'learning');
 assert.equal(coreProgress(unit,[...solved,win(unit.taskIds[2],day+2)],now+day+2).status,'mastered');
 assert.equal(coreProgress(unit,solved,now+day+2).due,true);
-assert.equal(nextCoreTask(solved,'',now+day+2).id,unit.taskIds[2]);
+assert.equal(nextCoreTask(solved,'',now+day+2).id,unit.id+'-review');
+assert.equal(coreProgress(unit,[...solved,win(unit.id+'-review',day+2)],now+day+2).status,'mastered');
+assert.equal(coreProgress(unit,[...solved,win(unit.id+'-review',100)],now+100).status,'learning');
 assert.equal(skill('Python core',written).mastery,0);
 assert.equal(skill('Python core',solved).proven,false);
 assert.equal(skill('Python core',[win(firstTask.id)]).calibrationError,0);
