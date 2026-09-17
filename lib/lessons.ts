@@ -1,4 +1,5 @@
 import {coreUnits} from './core-course';
+import sourceCourse from './source-course.json';
 export type Lesson = {id?:string;taskIds?:string[];topic:string;title:string;path:string;sections:{title:string;paragraphs:string[]}[];code:string;walkthrough:string[];question:string;reference:string;pitfall:string;taskId:string|null};
 const overviewLessons:Lesson[] = [
   {
@@ -497,4 +498,13 @@ const overviewLessons:Lesson[] = [
   }
 ];
 
-export const lessons:Lesson[] = [...coreUnits,...overviewLessons.filter(l=>l.topic!=='Python core')];
+export type CourseLesson=Lesson & {moduleId?:string;moduleTitle?:string;markdown?:string;sourceFile?:string};
+export const courseModules=sourceCourse.modules;
+export const lessons:CourseLesson[] = [...sourceCourse.lessons,...coreUnits,...overviewLessons.filter(l=>l.topic!=='Python core')];
+export function resolveLessonIndex(id?:string){
+ const exact=lessons.findIndex(l=>l.id===id&&l.moduleId);
+ if(exact>=0)return exact;
+ const unit=coreUnits.find(u=>u.id===id);
+ const source=lessons.findIndex(l=>l.moduleId&&(unit?l.taskIds?.some(t=>unit.taskIds.includes(t)):l.topic===id));
+ return source>=0?source:Math.max(0,lessons.findIndex(l=>l.id===id||l.topic===id));
+}

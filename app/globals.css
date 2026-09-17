@@ -40,3 +40,34 @@
 .progress-library button{text-align:left;flex:1;color:#a7ccff;min-width:180px}
 .progress-library span{font-size:12px;color:#a5b6c6}
 @media(max-width:999px){.task-main .practice-work{height:auto;min-height:0}.task-main .codearea{min-height:320px}.task-main .tests{min-height:340px;max-height:600px}.task-main .codearea textarea{height:280px}.testhead [data-slot=tabs-list]{gap:12px}.testhead [data-slot=tabs-trigger]{font-size:12px!important}.task-main .editorhead small{display:none}}
+
+.course-reader{grid-template-columns:290px minmax(0,1fr);max-width:1260px;margin:auto;align-items:start}
+.course-reader .theorynav{max-height:calc(100dvh - 100px);position:sticky;top:20px}
+.course-reader .theorynav details{width:100%;border-bottom:1px solid var(--border);padding:10px 0}
+.course-reader .theorynav summary{cursor:pointer;padding:10px 8px;color:#d8dce7;font-size:14px;line-height:1.5}
+.course-reader .theorynav summary small{display:block;margin:4px 0 0 14px;font-size:11px;color:#999fad}
+.course-reader .theorynav button{width:100%;font-size:12px;min-height:42px}
+.course-search{display:flex;gap:8px;align-items:center;border:1px solid var(--border);padding:10px;border-radius:8px;margin:6px 0 10px}
+.course-search input{min-width:0;width:100%;font-size:13px;background:none;outline:none}
+.source-note{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:#9aa3b3;margin:20px 0}
+.source-note a{display:flex;gap:6px;align-items:center;color:#9cc8ff}
+.chapter-outline{border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:28px}
+.chapter-outline summary,.chapter-response summary{cursor:pointer;color:#acd0ff;font-size:14px}
+.chapter-outline nav{display:flex;flex-direction:column;gap:10px;padding-top:16px}
+.chapter-outline a{color:#a8b8ce;font-size:13px}
+.course-markdown{font-size:16px;line-height:1.85;color:#d3d5df;overflow-wrap:anywhere}
+.course-markdown p{margin:16px 0}.course-markdown h2{margin:40px 0 18px;font-size:25px;line-height:1.45;color:#f2f3f8}
+.course-markdown h2:first-child{margin-top:0}.course-markdown h3{font-size:20px;margin:28px 0 14px;color:#e4e6ef}
+.course-markdown h4{font-size:17px;margin:24px 0 12px}.course-markdown ul{list-style:disc;padding-left:26px;margin:18px 0}
+.course-markdown ol{list-style:decimal;padding-left:26px;margin:18px 0}.course-markdown li{margin:6px 0}
+.course-markdown blockquote{border-left:3px solid #528bc8;padding:2px 20px;background:#22304455;margin:20px 0;color:#bccce0}
+.course-markdown hr{border:0;border-top:1px solid var(--border);margin:30px 0}
+.course-markdown .lesson-code{white-space:pre;overflow:auto;line-height:1.75;font-size:13px;max-width:100%;margin:20px 0}
+.course-markdown .lesson-code code{background:none;color:inherit;font-size:inherit;padding:0}
+.markdown-table{overflow:auto;margin:20px 0}.markdown-table th,.markdown-table td{padding:10px;border:1px solid var(--border);text-align:left;font-size:14px}
+.chapter-response{padding:20px 0;border-top:1px solid var(--border)}
+.progress-module{padding:12px 0;border-top:1px solid var(--border)}.progress-module summary{cursor:pointer;color:#cadcf2}
+.progress-module summary small{display:block;margin-top:6px}
+.progress-module>div{display:flex;flex-wrap:wrap;gap:16px;align-items:center;padding:12px;border-bottom:1px solid var(--border)}
+@media(max-width:1000px){.course-reader{grid-template-columns:1fr}.course-reader .theorynav{position:static;max-height:340px}}
+@media(max-width:640px){.course-markdown{font-size:15px}.course-markdown h2{font-size:22px}.course-markdown .lesson-code{font-size:12px}}
