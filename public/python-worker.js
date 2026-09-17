@@ -13,22 +13,23 @@ _results = []
 _stdout = io.StringIO()
 for _test in _tests:
     _ns = {'__name__': '__main__'}
+    _check = _test.get('check', '')
     try:
         with contextlib.redirect_stdout(_stdout), contextlib.redirect_stderr(_stdout):
             exec(compile(_source, 'solution.py', 'exec'), _ns)
-            _check = _test['check']
             try:
                 _compiled = compile(_check, '<test>', 'eval', flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT)
                 _value = eval(_compiled, _ns)
                 if inspect.isawaitable(_value): _value = await _value
-                if not _value: raise AssertionError('Результат не соответствует условию теста')
+                if not _value: raise AssertionError('Результат не совпал с ожидаемым')
             except SyntaxError:
                 _compiled = compile(_check, '<test>', 'exec', flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT)
                 _value = eval(_compiled, _ns)
                 if inspect.isawaitable(_value): await _value
         _results.append({'name': _test['name'], 'pass': True})
     except BaseException as _err:
-        _results.append({'name': _test['name'], 'pass': False, 'type': type(_err).__name__, 'error': ''.join(traceback.format_exception(type(_err), _err, _err.__traceback__))[-2200:]})
+        _trace = ''.join(traceback.format_exception(type(_err), _err, _err.__traceback__))
+        _results.append({'name': _test['name'], 'pass': False, 'type': type(_err).__name__, 'error': str(_err) or type(_err).__name__, 'check': _check, 'traceback': _trace[-2200:]})
 json.dumps({'results': _results, 'output': _stdout.getvalue()[-3000:]})
 `);postMessage({type:'done',...JSON.parse(out)});
 }catch(e){postMessage({type:'error',error:String(e)});}};

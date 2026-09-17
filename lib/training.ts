@@ -9,7 +9,7 @@ export const topics=['Python core','Collections','Functions','Exceptions','OOP',
 export const foundationPath=coreUnits.flatMap(u=>u.taskIds);
 export const firstTask=tasks.find(t=>t.id===foundationPath[0])!;
 export function foundationNext(entries:Entry[]){return nextCoreTask(entries)?.id;}
-export type Result={name:string;pass:boolean;error?:string;type?:string};
+export type Result={name:string;pass:boolean;error?:string;type?:string;check?:string;traceback?:string};
 export type Entry={id:string;session:string;task:string;mode:string;kind:'run'|'hint'|'review'|'skip'|'theory';time:number;elapsed:number;hints:number;before:number;after?:number;results?:Result[];code?:string;passed?:boolean;assisted?:boolean;explanation?:string;lessonId?:string;score?:number};
 export function skill(topic:string,entries:Entry[]){
  const ids=tasks.filter(t=>t.topic===topic).map(t=>t.id);const runs=entries.filter(e=>ids.includes(e.task)&&e.kind==='run');
