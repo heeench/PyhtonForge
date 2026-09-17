@@ -37,3 +37,9 @@ const mastered=[...all,...coreUnits.map(u=>win(u.taskIds[2],day+3))];
 assert.equal(skill('Python core',mastered).proven,true);
 assert.equal(skill('Python core',mastered).mastery,100);
 console.log('PASS: core order, manual modes, written evidence, hints, 24h threshold, distinct sessions, due review and full-module mastery.');
+const {middleStages}=load('lib/middle-roadmap.ts');
+const {tasks}=load('lib/training.ts');
+const nodes=middleStages.flatMap(s=>s.nodes);
+assert.equal(nodes.length,44);assert.equal(new Set(nodes.map(n=>n.id)).size,nodes.length);
+for(const n of nodes){for(const id of n.taskIds||[])assert(tasks.some(t=>t.id===id),`Missing task for ${n.id}: ${id}`);for(const id of n.requires||[])assert(nodes.some(other=>other.id===id));if(n.unitId)assert(coreUnits.some(u=>u.id===n.unitId));}
+console.log('PASS: 44 unique roadmap nodes, valid prerequisites, lessons and exercise targets.');
